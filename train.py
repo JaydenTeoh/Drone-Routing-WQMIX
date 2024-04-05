@@ -57,6 +57,7 @@ class Runner():
         self.env = env
         self.few_shot = args.few_shot
         self.eval_interval = 1000
+        self.best_performance = None
         
         # logging
         folder_name = f"seed_{args.seed}_" + time.asctime().replace(" ", "").replace(":", "_")
@@ -105,12 +106,6 @@ class Runner():
 
         return avail_actions
 
-    def store_data(self, obs_n, next_obs_n, actions_dict, agent_mask, rew_n, done_n):
-        data_step = {'obs': obs_n, 'obs_next': next_obs_n, 'actions': actions_dict['actions_n'],
-                     'rewards': rew_n, 'terminals': done_n, 'agent_mask': agent_mask, 
-                     'state': obs_n.reshape(-1), 'state_next': next_obs_n.reshape(-1)}
-        self.agents.memory.store(data_step)
-
     def benchmark(self, n_test_runs):
         key = (self.env.map_name, self.env.n_agents)
         if key in BENCHMARK_ENV_CONFIG:
@@ -128,9 +123,14 @@ class Runner():
                 if won:
                     won_count += 1
 
-        results_info = {"Test-Results/Mean-Episode-Rewards": np.array(episode_scores).mean(),
+        mean_performance = np.array(episode_scores).mean()
+        results_info = {"Test-Results/Mean-Episode-Rewards": mean_performance,
                         "Test-Results/Win-Rate": won_count / len(episode_scores)}
         self.log_infos(results_info, self.current_step)
+
+        if self.best_performance is None or self.best_performance >= mean_performance:
+            self.best_performance = mean_performance
+            self.agents.save_model("benchmark_model.pth")
 
     def run_episode(self, test_mode):
         if not test_mode:
@@ -138,6 +138,7 @@ class Runner():
                 self.env.ee_env.input_start_ori_array, self.env.ee_env.input_goal_array = get_start_goal(map_name=self.env.map_name,
                                                                                                         drone_num=self.env.n_agents,
                                                                                                         few_shot_chance=0.2)
+                print("start: ", self.env.ee_env.input_start_ori_array, "end: ", self.env.ee_env.input_goal_array)
             else:
                 self.env.ee_env.input_start_ori_array, self.env.ee_env.input_goal_array = [], []
 
@@ -167,7 +168,6 @@ class Runner():
                 transition = (obs_n, actions_dict, obs_n.reshape(-1), rew_n, done, avail_actions)
                 self.agents.memory.store_transitions(env_step, *transition)
             
-            print(f"obs:{next_obs_n},actions:{actions_dict['actions_n']},r:{rew_n},done:{terminated_n},info:{infos}")  
             episode_score += np.mean(rew_n)
             if done and not test_mode:
                 filled[env_step, 0] = 0
@@ -175,6 +175,7 @@ class Runner():
 
                 terminal_data = (next_obs_n, next_obs_n.reshape(-1), avail_actions, filled)
                 self.agents.memory.finish_path(env_step + 1, *terminal_data)
+                print(f"r:{rew_n},done:{terminated_n},info:{infos}")  
             
             if done:
                 has_negative = any(x < 0 for x in rew_n)
@@ -219,8 +220,8 @@ class Runner():
 def parse_arguments():
     parser = argparse.ArgumentParser(description='QMIX for DRP env')
     parser.add_argument('--config', type=str, default='./qmix/drp_config.yaml', help='Path to YAML config for training QMIX on DRP env')
-    parser.add_argument('--drone_num', type=int, default=4, help='Number of drones')
-    parser.add_argument('--map_name', type=str, default='map_aoba01', help='Name of the map')
+    parser.add_argument('--drone_num', type=int, default=2, help='Number of drones')
+    parser.add_argument('--map_name', type=str, default='map_3x3', help='Name of the map')
     args = parser.parse_args()
     return args
 

@@ -22,15 +22,15 @@ class QMIX_mixer(nn.Module):
         # self.hyper_w_1 = nn.Linear(self.dim_state, self.dim_hidden * self.n_agents)
         # self.hyper_w_2 = nn.Linear(self.dim_state, self.dim_hidden)
         self.hyper_w_1 = nn.Sequential(nn.Linear(self.dim_state, self.dim_hypernet_hidden),
-                                       nn.ReLU(),
+                                       nn.LeakyReLU(),
                                        nn.Linear(self.dim_hypernet_hidden, self.dim_hidden * self.n_agents)).to(device)
         self.hyper_w_2 = nn.Sequential(nn.Linear(self.dim_state, self.dim_hypernet_hidden),
-                                       nn.ReLU(),
+                                       nn.LeakyReLU(),
                                        nn.Linear(self.dim_hypernet_hidden, self.dim_hidden)).to(device)
 
         self.hyper_b_1 = nn.Linear(self.dim_state, self.dim_hidden).to(device)
         self.hyper_b_2 = nn.Sequential(nn.Linear(self.dim_state, self.dim_hypernet_hidden),
-                                       nn.ReLU(),
+                                       nn.LeakyReLU(),
                                        nn.Linear(self.dim_hypernet_hidden, 1)).to(device)
 
     def forward(self, values_n, states):
@@ -64,14 +64,14 @@ class QMIX_FF_mixer(nn.Module):
         self.n_agents = n_agents
         self.dim_input = self.n_agents + self.dim_state
         self.ff_net = nn.Sequential(nn.Linear(self.dim_input, self.dim_hidden),
-                                    nn.ReLU(),
+                                    nn.LeakyReLU(),
                                     nn.Linear(self.dim_hidden, self.dim_hidden),
-                                    nn.ReLU(),
+                                    nn.LeakyReLU(),
                                     nn.Linear(self.dim_hidden, self.dim_hidden),
-                                    nn.ReLU(),
+                                    nn.LeakyReLU(),
                                     nn.Linear(self.dim_hidden, 1)).to(self.device)
         self.ff_net_bias = nn.Sequential(nn.Linear(self.dim_state, self.dim_hidden),
-                                         nn.ReLU(),
+                                         nn.LeakyReLU(),
                                          nn.Linear(self.dim_hidden, 1)).to(self.device)
 
     def forward(self, values_n, states):

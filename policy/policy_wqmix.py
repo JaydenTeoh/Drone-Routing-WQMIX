@@ -67,7 +67,7 @@ def policy(obs, env, rnn_hidden): #Random Policy
     env_name_drones = env.map_name + f"_drones{env.n_agents}"
     args = load_config(f"./algo/configs/{env_name_drones}.yaml")
     args.model_dir = "./models/wqmix/" + env_name_drones
-    args.model_dir_load = args.model_dir + "/final_train_model.pth"
+    args.model_dir_load = args.model_dir + "/benchmark_model.pth"
     args.model_dir_save = args.model_dir
     args.log_dir = ""
     args.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')

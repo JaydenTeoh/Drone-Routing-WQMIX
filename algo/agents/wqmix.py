@@ -5,7 +5,7 @@ from algo.policies.mixers import *
 from algo.utils.buffers import *
 from algo.policies.learners import *
 from algo.agents.agents_marl import MARLAgents
-from algo.utils.functions import *
+from algo.utils.util import *
 import torch.nn as nn
 import torch
 
@@ -20,6 +20,7 @@ class WQMIX_Agents(MARLAgents):
     def __init__(self, env: DrpEnv, config: Namespace, device: Optional[Union[int, str, torch.device]] = None):
         self.alpha = config.alpha
         self.gamma = config.gamma
+        self.per_beta_start = config.per_beta_start
         self.start_greedy, self.end_greedy = config.start_greedy, config.end_greedy
         self.egreedy = self.start_greedy
         self.delta_egreedy = (self.start_greedy - self.end_greedy) / config.decay_step_greedy
@@ -76,14 +77,23 @@ class WQMIX_Agents(MARLAgents):
         optimizer = torch.optim.Adam(policy.parameters(), lr=self.lr, eps=1e-5)
         scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1.0, end_factor=0.5,
                                                       total_iters=self.n_episodes)
+        
+        # for PER
+        self.beta_anneal = DecayThenFlatSchedule(self.per_beta_start, 1.0, self.n_episodes, decay="linear")
+
         self.observation_space = env.observation_space
         self.action_space = env.action_space
         self.representation_info_shape = policy.representation.output_shapes
         self.auxiliary_info_shape = {}
 
-        buffer = MARL_OffPolicyBuffer_RNN if self.use_recurrent else MARL_OffPolicyBuffer
-        input_buffer = (self.n_agents, state_shape, self.obs_shape, self.act_shape, self.rew_shape,
-                        self.done_shape, 1, config.buffer_size, config.batch_size)
+        buffer = Per_MARL_OffPolicyBuffer_RNN if self.use_recurrent else MARL_OffPolicyBuffer
+        if self.use_recurrent: # only implemented PER for recurrent
+            input_buffer = (config.per_nu, config.per_alpha, self.n_agents, state_shape, self.obs_shape, self.act_shape, self.rew_shape,
+                            self.done_shape, 1, config.buffer_size, config.batch_size)
+        else:
+            input_buffer = (self.n_agents, state_shape, self.obs_shape, self.act_shape, self.rew_shape,
+                            self.done_shape, 1, config.buffer_size, config.batch_size)
+        
         memory = buffer(*input_buffer, max_episode_length=env.time_limit, dim_act=self.dim_act)
         config.n_agents = self.n_agents
 
@@ -127,12 +137,16 @@ class WQMIX_Agents(MARLAgents):
         if self.egreedy >= self.end_greedy:
             self.egreedy = self.start_greedy - self.delta_egreedy * i_step
         info_train = {}
+        beta = self.beta_anneal.eval(i_step)
+
         if i_step > self.start_training:
             for i_epoch in range(n_epoch):
-                sample = self.memory.sample()
+                sample, idxes = self.memory.sample(beta)
                 if self.use_recurrent:
-                    info_train = self.learner.update_recurrent(sample)
+                    td_error, info_train = self.learner.update_recurrent(sample)
+                    self.memory.update_priorities(idxes, td_error) # update the priorities in PER buffer
                 else:
-                    info_train = self.learner.update(sample)
+                    td_error, info_train = self.learner.update(sample)
+                    # have not implemented PER for non-RNN
         info_train["epsilon-greedy"] = self.egreedy
         return info_train

@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Sequence, Union
 from argparse import Namespace
 import os
+import numpy as np
 
 
 class Learner(ABC):
@@ -300,7 +301,7 @@ class WQMIX_Learner(LearnerMAS):
             "predictQ": q_tot_eval.mean().item()
         }
 
-        return info
+        return np.abs(td_error.cpu().detach().numpy()), info
 
     def update_recurrent(self, sample):
         """
@@ -408,4 +409,4 @@ class WQMIX_Learner(LearnerMAS):
             "predictQ": q_tot_eval.mean().item()
         }
 
-        return info
+        return np.abs(td_error.cpu().detach().numpy()), info
