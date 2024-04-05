@@ -52,8 +52,13 @@ def calculate_cost(instances, policy):
             n_obs = env.reset()
             goal_checker = False
             goal_step = [None] * drone_num
+            rnn_hidden_state = None # for rnn policy
             while not goal_checker:
-                actions = policy(n_obs, env)
+                """
+                INPUT: takes in current obs, environment and the previous rnn_hidden_state
+                OUTPUT: returns action and new rnn_hidden_state
+                """
+                actions, rnn_hidden_state = policy(n_obs, env, rnn_hidden_state)
                 n_obs, reward, done, info = env.step(actions)
                 goal_checker = all(done)
                 for i in range(drone_num):

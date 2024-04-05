@@ -1,0 +1,41 @@
+agent: "OWQMIX"
+seed: 101
+logger: "tensorboard"
+test_mode: false
+continuous_action: false
+use_global_state: true
+policy: "Mixing_Q_network"
+representation: "Basic_RNN"
+hidden_dim_mixing_net: 256
+hidden_dim_hyper_net: 256
+hidden_dim_ff_mix_net: 256
+fc_hidden_sizes: [ 128, 64, 64, 64, ]
+qtran_net_hidden_dim: 64
+lambda_opt: 1.0
+lambda_nopt: 1.0
+buffer_size: 7000
+batch_size: 256
+learning_rate: 0.0003
+gamma: 0.995
+alpha: 0.1
+double_q: true
+representation_hidden_size: [ 128, 64, 64, 64, ]
+q_hidden_size: [128, 64, 64, ]
+activation: "LeakyReLU"
+normalize: "LayerNorm"
+initialize: "orthogonal"
+use_recurrent: true
+rnn: "GRU"
+recurrent_hidden_size: 256
+N_recurrent_layers: 3
+dropout: 0.1
+start_greedy: 1.0
+end_greedy: 0.05
+decay_step_greedy: 140000
+running_steps: 20000000
+train_per_step: false
+start_training: 5000
+sync_frequency: 100
+training_frequency: 1
+use_grad_clip: true
+grad_clip_norm: 0.5

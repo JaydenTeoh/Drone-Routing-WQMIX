@@ -1,5 +1,8 @@
 import gym
-from policy.policy import policy
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), ''))
+from policy.policy_wqmix import policy
 # from example.policy_prfl import policy
 
 def policy_evaluation(policy, drone_num, map_name, reward_list, start, goal, render):
@@ -23,11 +26,17 @@ def policy_evaluation(policy, drone_num, map_name, reward_list, start, goal, ren
     print(f"action_space:{env.action_space}")
 
     done_all = False
+    rnn_hidden_state = None
     while not done_all:
         if render == True:
             env.render()
         print(f"obs:{obs}")  # current global observation
-        actions = policy(obs, env)  # policy:input n_obs,env return each drone's action
+
+        """
+        INPUT: takes in current obs, environment and the previous rnn_hidden_state
+        OUTPUT: returns action and new rnn_hidden_state
+        """
+        actions, rnn_hidden_state = policy(obs, env, rnn_hidden_state)
         obs, reward, done, info = env.step(
             actions
         )  # transfer to next state once joint action is taken
@@ -37,8 +46,8 @@ def policy_evaluation(policy, drone_num, map_name, reward_list, start, goal, ren
 
 
 if __name__ == "__main__":
-    drone_num = 3  # the number of drones (min:2 max:30)
-    map_name = "map_aoba01"  # the map name (available maps: "map_3x3","map_aoba01","map_osaka" )
+    drone_num = 2  # the number of drones (min:2 max:30)
+    map_name = "map_3x3"  # the map name (available maps: "map_3x3","map_aoba01","map_osaka" )
 
     # reward_list is individual reward function where
     # "goal: 100" means one drone will obtain 100 rewards once it reach its goal.
@@ -51,8 +60,8 @@ if __name__ == "__main__":
     }  # Developers can freely to alter the reward function (rewards are not used as evaluation index)
 
     # If the start and goal are empty lists, they are randomly selected.
-    start = [0,2,4,]  # drone1's start: node 0;  drone2's start: node 2;  drone3's start: node 4;
-    goal = [3,6,1,]  # drone1's goal: node 3;  drone2's goal: node 6;  drone3's goal: node 1;
+    start = [0,2]  # drone1's start: node 0;  drone2's start: node 2;  drone3's start: node 4;
+    goal = [5,6]  # drone1's goal: node 3;  drone2's goal: node 6;  drone3's goal: node 1;
     render = True  # Choose whether to visualize
 
     """
@@ -61,7 +70,7 @@ if __name__ == "__main__":
     which is essentially a mapping from input(global observation) to output(joint action) at each step
     """
     policy_evaluation(
-        policy=policy,  # this is an example policy
+    policy=policy,  # this is an example policy
         drone_num=drone_num,
         map_name=map_name,
         reward_list=reward_list,
