@@ -149,4 +149,5 @@ class WQMIX_Agents(MARLAgents):
                     td_error, info_train = self.learner.update(sample)
                     # have not implemented PER for non-RNN
         info_train["epsilon-greedy"] = self.egreedy
+        info_train["per_beta"] = beta
         return info_train

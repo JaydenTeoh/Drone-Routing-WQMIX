@@ -201,7 +201,7 @@ class Runner():
     def train(self, n_episodes):
         for _ in range(n_episodes):
             if self.current_step % self.eval_interval == 0:
-                self.benchmark(5)
+                self.benchmark(n_test_runs=10)
 
             self.current_step += 1
             self.run_episode(test_mode=False)
@@ -220,7 +220,7 @@ class Runner():
 def parse_arguments():
     parser = argparse.ArgumentParser(description='QMIX for DRP env')
     parser.add_argument('--config', type=str, default='./qmix/drp_config.yaml', help='Path to YAML config for training QMIX on DRP env')
-    parser.add_argument('--drone_num', type=int, default=2, help='Number of drones')
+    parser.add_argument('--drone_num', type=int, default=3, help='Number of drones')
     parser.add_argument('--map_name', type=str, default='map_3x3', help='Name of the map')
     args = parser.parse_args()
     return args
