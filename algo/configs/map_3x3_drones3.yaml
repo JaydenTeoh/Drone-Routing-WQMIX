@@ -17,6 +17,9 @@ buffer_size: 5000
 batch_size: 128
 learning_rate: 0.0003
 gamma: 0.995
+per_beta_start: 0.4
+per_nu: 0.9
+per_alpha: 0.6
 alpha: 0.1
 double_q: true
 representation_hidden_size: [ 128, 64, 32, 32, ]

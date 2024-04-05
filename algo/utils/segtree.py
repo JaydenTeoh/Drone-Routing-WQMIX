@@ -1,6 +1,5 @@
 import operator
 
-
 class SegmentTree(object):
     def __init__(self, capacity, operation, neutral_element):
         assert capacity > 0 and capacity & (capacity - 1) == 0, "capacity must be positive and a power of 2."

@@ -295,7 +295,6 @@ class Per_MARL_OffPolicyBuffer_RNN(MARL_OffPolicyBuffer):
             res.append(int(idx))
         return res
 
-
     def sample(self, beta):
         step_choices = np.zeros(self.batch_size)
         # weights = np.zeros(self.batch_size)
@@ -313,16 +312,16 @@ class Per_MARL_OffPolicyBuffer_RNN(MARL_OffPolicyBuffer):
             weights_.append(weight / max_weight)
         step_choices = idxes
         # weights = np.array(weights_)
+
         samples = {k: self.data[k][step_choices] for k in self.keys}
         return samples, step_choices
 
     def update_priorities(self, idxes, td_errors):
+        td_errors = td_errors.reshape(self.batch_size, -1)
         for idx, error in zip(idxes, td_errors):
-            assert 0 <= idx < self.size
-            priority = error[0]
-
-            if priority == 0:
-                priority += self.per_eps
+            # new priorities are a combination of the maximum TD error across sequence and the mean TD error across sequence (see R2D2 paper)
+            priority = ((1 - self.per_nu) * np.mean(error) +
+                              self.per_nu * np.max(error)) + self.per_eps
 
             self._it_sum[idx] = priority ** self.per_alpha
             self._it_min[idx] = priority ** self.per_alpha
