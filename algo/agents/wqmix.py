@@ -21,6 +21,7 @@ class WQMIX_Agents(MARLAgents):
         self.alpha = config.alpha
         self.gamma = config.gamma
         self.per_beta_start = config.per_beta_start
+        self.running_per = config.per_beta_start
         self.start_greedy, self.end_greedy = config.start_greedy, config.end_greedy
         self.egreedy = self.start_greedy
         self.delta_egreedy = (self.start_greedy - self.end_greedy) / config.decay_step_greedy
@@ -78,9 +79,6 @@ class WQMIX_Agents(MARLAgents):
         scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1.0, end_factor=0.5,
                                                       total_iters=self.n_episodes)
         
-        # for PER
-        self.beta_anneal = DecayThenFlatSchedule(self.per_beta_start, 1.0, self.n_episodes, decay="linear")
-
         self.observation_space = env.observation_space
         self.action_space = env.action_space
         self.representation_info_shape = policy.representation.output_shapes
@@ -137,17 +135,20 @@ class WQMIX_Agents(MARLAgents):
         if self.egreedy >= self.end_greedy:
             self.egreedy = self.start_greedy - self.delta_egreedy * i_step
         info_train = {}
-        beta = self.beta_anneal.eval(i_step)
 
         if i_step > self.start_training:
             for i_epoch in range(n_epoch):
-                sample, idxes = self.memory.sample(beta)
+                sample, idxes = self.memory.sample(self.running_per)
                 if self.use_recurrent:
                     td_error, info_train = self.learner.update_recurrent(sample)
                     self.memory.update_priorities(idxes, td_error) # update the priorities in PER buffer
                 else:
                     td_error, info_train = self.learner.update(sample)
                     # have not implemented PER for non-RNN
+
+        # importance sampling corrections matter more near the end of training
+        # PER beta starts small and anneals towards one
+        self.running_per += (1 - self.per_beta_start) / self.n_episodes
         info_train["epsilon-greedy"] = self.egreedy
-        info_train["per_beta"] = beta
+        info_train["per_beta"] = self.running_per
         return info_train

@@ -128,7 +128,7 @@ class Runner():
                         "Test-Results/Win-Rate": won_count / len(episode_scores)}
         self.log_infos(results_info, self.current_step)
 
-        if self.best_performance is None or self.best_performance >= mean_performance:
+        if self.best_performance is None or mean_performance >= self.best_performance:
             self.best_performance = mean_performance
             self.agents.save_model("benchmark_model.pth")
 
