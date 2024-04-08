@@ -46,8 +46,8 @@ def policy_evaluation(policy, drone_num, map_name, reward_list, start, goal, ren
 
 
 if __name__ == "__main__":
-    drone_num = 3  # the number of drones (min:2 max:30)
-    map_name = "map_3x3"  # the map name (available maps: "map_3x3","map_aoba01","map_osaka" )
+    drone_num = 10  # the number of drones (min:2 max:30)
+    map_name = "map_shibuya"  # the map name (available maps: "map_3x3","map_aoba01","map_osaka" )
 
     # reward_list is individual reward function where
     # "goal: 100" means one drone will obtain 100 rewards once it reach its goal.
@@ -60,8 +60,8 @@ if __name__ == "__main__":
     }  # Developers can freely to alter the reward function (rewards are not used as evaluation index)
 
     # If the start and goal are empty lists, they are randomly selected.
-    start = [6,3,5]  # drone1's start: node 0;  drone2's start: node 2;  drone3's start: node 4;
-    goal = [2,1,8]  # drone1's goal: node 3;  drone2's goal: node 6;  drone3's goal: node 1;
+    start = [3, 15, 18, 5, 19, 6, 25, 13, 11, 23]  # drone1's start: node 0;  drone2's start: node 2;  drone3's start: node 4;
+    goal = [20, 9, 21, 22, 16, 17, 2, 4, 14, 7]  # drone1's goal: node 3;  drone2's goal: node 6;  drone3's goal: node 1;
     render = True  # Choose whether to visualize
 
     """

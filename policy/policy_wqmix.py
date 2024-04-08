@@ -14,27 +14,6 @@ TEAM_NAME = "JaydenTeoh"
 #(or the team name if participating as a team).
 ##############################
 
-# args = Namespace(agent="OWQMIX", seed=101, logger="tensorboard", test_mode=False, device="cpu",
-#                    continuous_action=False,
-#                    policy="Mixing_Q_network",
-#                    representation="Basic_RNN",
-#                    hidden_dim_mixing_net=64,  # hidden units of mixing network
-#                    hidden_dim_hyper_net=128,  # hidden units of hyper network
-#                    hidden_dim_ff_mix_net=256, # hidden units of mixing network
-#                    fc_hidden_sizes=[ 128, 64, 32, ],
-#                    qtran_net_hidden_dim=64, lambda_opt=1.0, lambda_nopt=1.0,
-#                    buffer_size=5000, batch_size=64, learning_rate=3e-4,
-#                    gamma=0.995,  # discount factor
-#                    alpha=0.1,
-#                    double_q=True,  # use double q learning
-#                    representation_hidden_size=[128, 64, 32, ],
-#                    q_hidden_size=[128, ],  # the units for each hidden layer
-#                    activation="LeakyReLU", use_recurrent=True, rnn="GRU",
-#                    recurrent_hidden_size=64, N_recurrent_layers=2, dropout=0.1,
-#                    start_greedy=1.0, end_greedy=0.05, decay_step_greedy=20000,
-#                    running_steps=3000000, train_per_step=False, start_training=1000, 
-#                    sync_frequency=100, training_frequency=1, use_grad_clip=True, grad_clip_norm=0.5)
-
 def process_obs(obs):
     curr_pos = obs[:len(obs)//2]
     target_pos = np.argmax(obs[len(obs)//2:]) / (len(obs)//2) # get normalized goal
@@ -65,7 +44,7 @@ def load_config(config_path):
 
 def policy(obs, env, rnn_hidden): #Random Policy 
     env_name_drones = env.map_name + f"_drones{env.n_agents}"
-    args = load_config(f"./algo/configs/{env_name_drones}.yaml")
+    args = load_config(f"./configs/{env_name_drones}.yaml")
     args.model_dir = "./models/wqmix/" + env_name_drones
     args.model_dir_load = args.model_dir + "/benchmark_model.pth"
     args.model_dir_save = args.model_dir

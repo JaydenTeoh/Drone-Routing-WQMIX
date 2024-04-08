@@ -10,7 +10,7 @@ import yaml
 import argparse
 from copy import deepcopy
 from algo.agents.wqmix import WQMIX_Agents
-from algo.configs.benchmark import BENCHMARK_ENV_CONFIG
+from configs.benchmark import BENCHMARK_ENV_CONFIG
 from argparse import Namespace
 from torch.utils.tensorboard import SummaryWriter
 
@@ -138,7 +138,7 @@ class Runner():
                 self.env.ee_env.input_start_ori_array, self.env.ee_env.input_goal_array = get_start_goal(map_name=self.env.map_name,
                                                                                                         drone_num=self.env.n_agents,
                                                                                                         few_shot_chance=0.2)
-                print("start: ", self.env.ee_env.input_start_ori_array, "end: ", self.env.ee_env.input_goal_array)
+                # print("start: ", self.env.ee_env.input_start_ori_array, "end: ", self.env.ee_env.input_goal_array)
             else:
                 self.env.ee_env.input_start_ori_array, self.env.ee_env.input_goal_array = [], []
 
@@ -175,7 +175,7 @@ class Runner():
 
                 terminal_data = (next_obs_n, next_obs_n.reshape(-1), avail_actions, filled)
                 self.agents.memory.finish_path(env_step + 1, *terminal_data)
-                print(f"r:{rew_n},done:{terminated_n},info:{infos}")  
+                # print(f"r:{rew_n},done:{terminated_n},info:{infos}")  
             
             if done:
                 has_negative = any(x < 0 for x in rew_n)
@@ -201,7 +201,7 @@ class Runner():
     def train(self, n_episodes):
         for _ in range(n_episodes):
             if self.current_step % self.eval_interval == 0:
-                self.benchmark(n_test_runs=10)
+                self.benchmark(n_test_runs=20)
 
             self.current_step += 1
             self.run_episode(test_mode=False)
@@ -250,7 +250,7 @@ map_shibuya         |  12           | 3
 if __name__ == "__main__":
     # make env
     args = parse_arguments()
-    args.config = f"./algo/configs/{args.map_name}_drones{args.drone_num}.yaml"
+    args.config = f"./configs/{args.map_name}_drones{args.drone_num}.yaml"
     config = load_config(args)
 
     reward_list = {
