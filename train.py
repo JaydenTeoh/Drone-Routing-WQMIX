@@ -124,14 +124,14 @@ class Runner():
                 if won:
                     won_count += 1
 
-        mean_performance = np.array(episode_scores).mean()
-        results_info = {"Test-Results/Mean-Episode-Rewards": mean_performance,
+        mean_loss = np.array(episode_scores).mean()
+        results_info = {"Test-Results/Mean-Episode-Rewards": mean_loss,
                         "Test-Results/Win-Rate": won_count / len(episode_scores)}
         self.log_infos(results_info, self.current_step)
 
-        if self.best_performance is None or mean_performance >= self.best_performance:
+        if self.best_performance is None or mean_loss <= self.best_performance:
             print("Best benchmark performance, saving model at eps ", self.current_step, "| Win rate: ", won_count / len(episode_scores))
-            self.best_performance = mean_performance
+            self.best_performance = mean_loss
             self.agents.save_model("benchmark_model.pth")
 
     def run_episode(self, test_mode):
