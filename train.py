@@ -46,7 +46,7 @@ def get_start_goal(map_name, drone_num, few_shot_chance=0.2):
     return [], []
 
 class Runner():
-    def __init__(self, args, env):
+    def __init__(self, args, env, reward_list):
         # Set random seeds
         set_seed(args.seed)
 
@@ -56,8 +56,9 @@ class Runner():
 
         self.env = env
         self.few_shot = args.few_shot
-        self.eval_interval = 1000
+        self.eval_interval = self.args.eval_interval
         self.best_performance = None
+        self.reward_list = reward_list
         
         # logging
         folder_name = f"seed_{args.seed}_" + time.asctime().replace(" ", "").replace(":", "_")
@@ -129,6 +130,7 @@ class Runner():
         self.log_infos(results_info, self.current_step)
 
         if self.best_performance is None or mean_performance >= self.best_performance:
+            print("Best benchmark performance, saving model at eps ", self.current_step, "| Win rate: ", won_count / len(episode_scores))
             self.best_performance = mean_performance
             self.agents.save_model("benchmark_model.pth")
 
@@ -138,7 +140,6 @@ class Runner():
                 self.env.ee_env.input_start_ori_array, self.env.ee_env.input_goal_array = get_start_goal(map_name=self.env.map_name,
                                                                                                         drone_num=self.env.n_agents,
                                                                                                         few_shot_chance=0.2)
-                # print("start: ", self.env.ee_env.input_start_ori_array, "end: ", self.env.ee_env.input_goal_array)
             else:
                 self.env.ee_env.input_start_ori_array, self.env.ee_env.input_goal_array = [], []
 
@@ -149,6 +150,10 @@ class Runner():
         rnn_hidden = self.agents.policy.representation.init_hidden(self.agents.n_agents)
         env_step = 0
         episode_score = 0
+        if test_mode:
+            goal_step = [None] * self.agents.n_agents
+            goal_drones = 0
+
         won_episode = False
 
         while not done:
@@ -164,11 +169,20 @@ class Runner():
 
             filled[env_step] = 1
             done = all(terminated_n)
+
             if not test_mode:
                 transition = (obs_n, actions_dict, obs_n.reshape(-1), rew_n, done, avail_actions)
                 self.agents.memory.store_transitions(env_step, *transition)
+                episode_score += np.mean(rew_n)
+            else: # benchmark scoring
+                for i in range(self.agents.n_agents):
+                    if rew_n[i] == self.reward_list["goal"]:  # goal
+                        goal_drones += 1
+                        goal_step[i] = infos["step"]
+                    elif rew_n[i] == self.reward_list["collision"] * self.env.speed:  # collision
+                        if goal_step[i] == None:
+                            goal_step[i] = 100
             
-            episode_score += np.mean(rew_n)
             if done and not test_mode:
                 filled[env_step, 0] = 0
                 avail_actions = self.get_avail_actions()
@@ -177,10 +191,6 @@ class Runner():
                 self.agents.memory.finish_path(env_step + 1, *terminal_data)
                 # print(f"r:{rew_n},done:{terminated_n},info:{infos}")  
             
-            if done:
-                has_negative = any(x < 0 for x in rew_n)
-                won_episode = env_step < self.episode_length and not has_negative
-
             env_step += 1
             obs_n = deepcopy(next_obs_n)
         
@@ -194,8 +204,15 @@ class Runner():
             episode_info = {"Train_Episode_Score": episode_score}
             self.log_infos(episode_info, self.current_step)
             self.log_infos(train_info, self.current_step)
+        else: # benchmark scoring
+            for i in range(self.agents.n_agents):
+                if goal_step[i] == None:
+                    goal_step[i] = 100
+            episode_score = sum(goal_step)
+            won_episode = goal_drones == self.agents.n_agents
+            return episode_score, won_episode
         
-        return episode_score, won_episode
+        return episode_score
         
 
     def train(self, n_episodes):
@@ -255,9 +272,9 @@ if __name__ == "__main__":
 
     reward_list = {
         "goal": 100,
-        "collision": -10,
-        "wait": -5,
-        "move": -1,
+        "collision": -20,
+        "wait": -0.2,
+        "move": -0.1,
     }
 
     env = gym.make(
@@ -267,6 +284,6 @@ if __name__ == "__main__":
     )
 
     config.few_shot = True # whether to include benchmarks in training envs
-    runner = Runner(config, env)
+    runner = Runner(config, env, reward_list)
     runner.run()
     runner.finish()

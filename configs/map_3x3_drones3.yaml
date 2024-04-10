@@ -35,9 +35,10 @@ end_greedy: 0.05
 decay_step_greedy: 180000
 running_steps: 24000000
 train_per_step: false
-start_training: 100
+start_training: 5000
 sync_frequency: 100
 training_frequency: 1
+eval_interval: 1000
 use_grad_clip: true
 grad_clip_norm: 0.5
-use_popart: true
+use_popart: false

@@ -6,10 +6,10 @@ continuous_action: false
 use_global_state: true
 policy: "Mixing_Q_network"
 representation: "Basic_RNN"
-hidden_dim_mixing_net: 128
+hidden_dim_mixing_net: 256
 hidden_dim_hyper_net: 256
 hidden_dim_ff_mix_net: 256
-fc_hidden_sizes: [ 128, 64, 64, 32, ]
+fc_hidden_sizes: [ 128, 64, 32, ]
 lambda_opt: 1.0
 lambda_nopt: 1.0
 buffer_size: 5000
@@ -21,7 +21,7 @@ per_beta_start: 0.4
 per_nu: 0.9
 per_alpha: 0.6
 double_q: true
-representation_hidden_size: [ 128, 64, 64, 32, ]
+representation_hidden_size: [ 128, 64, 32, ]
 activation: "LeakyReLU"
 normalize: "LayerNorm"
 initialize: "orthogonal"
@@ -32,11 +32,13 @@ N_recurrent_layers: 2
 dropout: 0.2
 start_greedy: 0.8
 end_greedy: 0.05
-decay_step_greedy: 180000
-running_steps: 24000000
+decay_step_greedy: 280000
+running_steps: 30000000
 train_per_step: false
 start_training: 4000
 sync_frequency: 200
 training_frequency: 1
+eval_interval: 1000
 use_grad_clip: true
 grad_clip_norm: 0.5
+use_popart: false

@@ -265,10 +265,8 @@ class WQMIX_Learner(LearnerMAS):
         filled = filled.reshape(-1, 1)
         
         if self.use_popart:
-            print("target value WITHOUT normarlize", rewards + (1 - terminals) * self.args.gamma * q_tot_next_centralized)
             target_value = rewards + (1 - terminals) * self.args.gamma * self.popart.denormalize(q_tot_next_centralized) 
             target_value = self.popart(target_value) # normalize values
-            print("target value with normarlize", target_value)
         else:
             target_value = rewards + (1 - terminals) * self.args.gamma * q_tot_next_centralized
 

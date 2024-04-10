@@ -38,5 +38,7 @@ train_per_step: false
 start_training: 1000
 sync_frequency: 100
 training_frequency: 1
+eval_interval: 1000
 use_grad_clip: true
 grad_clip_norm: 0.5
+use_popart: false
