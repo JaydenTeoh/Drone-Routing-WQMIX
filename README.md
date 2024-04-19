@@ -1,6 +1,6 @@
 <link href="assets\css\markdown.css"></link>
 
-# Codes of [DRP Challenge](https://drp-challenge.com/#/overview)
+# Solving the [DRP Challenge](https://drp-challenge.com/#/overview) using Deep Reinforcement Learning
 
 ## Methodology
 To solve the drone routing problem, I decided to train decentralized but homogenous drone agent policies and a centralised action-value function using the WQMIX (Weighted QMIX) algorithm. WQMIX extends the QMIX algorithm by introducing weighting such that the action-value function can prioritize better joint actions. Although a centralized policy would have probably offered better benchmark performance, the rationale behind adopting decentralized policies was to emulate real-world drone routing dynamics, where drones navigate autonomously based on local information.
@@ -27,9 +27,8 @@ python train.py --map_name=<INCLUDE MAP NAME> --drone_num=<INCLUDE DRONE NUM>
 
 Pretrained models are also available under [models](models/wqmix/). To test the pretrained models, adjust the `drone_num` and `map_name` variables in the main function of `policy_tester.py` accordingly and execute it.
 
-
+&nbsp;
 # Original DRP Challenge Information
-
 
 <a id="development"></a>
 
