@@ -43,7 +43,7 @@ class MapMake():
 			self.close()
 			sys.exit(0)
 		else:
-			print('Mal Environment initialized')
+			print('Map Environment initialized')
 
 		print('Agent numbers', self.agent_num)
 

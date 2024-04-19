@@ -54,8 +54,7 @@ def policy(obs, env, rnn_hidden): #Random Policy
     agents = WQMIX_Agents(env, args, args.device)
     agents.load_model(args.model_dir_load)
 
-    print(f"obs_size:{env.observation_space[0].shape[0]}")
-    print(f"n_actions:{env.action_space[0].n}")
+    # print(f"Testing on {env.map_name} with {env.n_agent} drones")
 
     if rnn_hidden == None: # first env step
         rnn_hidden = agents.policy.representation.init_hidden(env.n_agents)

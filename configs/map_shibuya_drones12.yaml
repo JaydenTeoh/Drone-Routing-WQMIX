@@ -32,8 +32,8 @@ N_recurrent_layers: 2
 dropout: 0.2
 start_greedy: 0.8
 end_greedy: 0.05
-decay_step_greedy: 380000
-running_steps: 40000000
+decay_step_greedy: 400000
+running_steps: 44000000
 train_per_step: false
 start_training: 8000
 sync_frequency: 200

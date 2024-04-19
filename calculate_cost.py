@@ -3,7 +3,7 @@ import time
 import json
 from datetime import datetime
 
-import policy.policy as submitted
+import policy.policy_wqmix as submitted
 import problem.problems as problems
 
 ### Parameters

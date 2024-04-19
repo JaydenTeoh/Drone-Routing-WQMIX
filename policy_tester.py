@@ -3,7 +3,6 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), ''))
 from policy.policy_wqmix import policy
-# from example.policy_prfl import policy
 
 def policy_evaluation(policy, drone_num, map_name, reward_list, start, goal, render):
     if not start or goal:
@@ -46,7 +45,7 @@ def policy_evaluation(policy, drone_num, map_name, reward_list, start, goal, ren
 
 
 if __name__ == "__main__":
-    drone_num = 6  # the number of drones (min:2 max:30)
+    drone_num = 4  # the number of drones (min:2 max:30)
     map_name = "map_aoba01"  # the map name (available maps: "map_3x3","map_aoba01","map_osaka" )
 
     # reward_list is individual reward function where
@@ -60,8 +59,8 @@ if __name__ == "__main__":
     }  # Developers can freely to alter the reward function (rewards are not used as evaluation index)
 
     # If the start and goal are empty lists, they are randomly selected.
-    start = [1, 2, 0, 4, 16, 12] # drone1's start: node 0;  drone2's start: node 2;  drone3's start: node 4;
-    goal = [10, 13, 17, 14, 7, 5]  # drone1's goal: node 3;  drone2's goal: node 6;  drone3's goal: node 1;
+    start = [11, 9, 2, 7] # drone1's start: node 0;  drone2's start: node 2;  drone3's start: node 4;
+    goal = [8, 12, 15, 10]  # drone1's goal: node 3;  drone2's goal: node 6;  drone3's goal: node 1;
     render = True  # Choose whether to visualize
 
     """
@@ -70,7 +69,7 @@ if __name__ == "__main__":
     which is essentially a mapping from input(global observation) to output(joint action) at each step
     """
     policy_evaluation(
-    policy=policy,  # this is an example policy
+        policy=policy,  # this is an example policy
         drone_num=drone_num,
         map_name=map_name,
         reward_list=reward_list,
