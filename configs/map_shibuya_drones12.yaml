@@ -8,13 +8,13 @@ policy: "Mixing_Q_network"
 representation: "Basic_RNN"
 hidden_dim_mixing_net: 256
 hidden_dim_hyper_net: 256
-hidden_dim_ff_mix_net: 256
+hidden_dim_ff_mix_net: 512
 fc_hidden_sizes: [ 64, 32, ]
 lambda_opt: 1.0
 lambda_nopt: 1.0
-buffer_size: 5000
+buffer_size: 3000
 batch_size: 128
-learning_rate: 0.0001
+learning_rate: 0.0002
 gamma: 0.999
 alpha: 0.1
 per_beta_start: 0.4
@@ -28,9 +28,9 @@ initialize: "orthogonal"
 use_recurrent: true
 rnn: "GRU"
 recurrent_hidden_size: 256
-N_recurrent_layers: 2
-dropout: 0.2
-start_greedy: 0.8
+N_recurrent_layers: 1
+dropout: 0.0
+start_greedy: 0.95
 end_greedy: 0.05
 decay_step_greedy: 400000
 running_steps: 44000000

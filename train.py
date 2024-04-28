@@ -125,7 +125,7 @@ class Runner():
                     won_count += 1
 
         mean_loss = np.array(episode_scores).mean()
-        results_info = {"Test-Results/Mean-Episode-Rewards": mean_loss,
+        results_info = {"Test-Results/Mean-Episode-Loss": mean_loss,
                         "Test-Results/Win-Rate": won_count / len(episode_scores)}
         self.log_infos(results_info, self.current_step)
 
