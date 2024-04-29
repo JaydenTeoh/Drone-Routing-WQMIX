@@ -26,6 +26,7 @@ python train.py --map_name=<INCLUDE MAP NAME> --drone_num=<INCLUDE DRONE NUM>
 ```
 
 Pretrained models are also available under [models](models/wqmix/). To test the pretrained models, adjust the `drone_num` and `map_name` variables in the main function of `policy_tester.py` accordingly and execute it.
+The benchmark scores for the pretrained models can be found in the 'benchmark_scores.json' file.
 
 &nbsp;
 # Original DRP Challenge Information
