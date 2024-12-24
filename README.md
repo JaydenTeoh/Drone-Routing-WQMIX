@@ -5,7 +5,7 @@
 ## Methodology
 To solve the drone routing problem, I decided to train decentralized but homogenous drone agent policies and a centralised action-value function using the WQMIX (Weighted QMIX) algorithm. WQMIX extends the QMIX algorithm by introducing weighting such that the action-value function can prioritize better joint actions. Although a centralized policy would have probably offered better benchmark performance, the rationale behind adopting decentralized policies was to emulate real-world drone routing dynamics, where drones navigate autonomously based on local information.
 
-Additionally, I leveraged RNNs to capture temporal dependencies and recurrent experience replay (from the [R2D2 paper](https://openreview.net/pdf?id=r1lyTjAqYX)) for prioritizing experiences with higher TD errors. Last but not least, for an extra boost to the benchmark performance of the trained models, I incorporated the benchmark environments within the training loop for few-shot learning.
+Additionally, I leveraged RNNs to capture temporal dependencies and recurrent experience replay (from the [R2D2 paper](https://openreview.net/pdf?id=r1lyTjAqYX)) for prioritizing experiences with higher TD errors.
 
 ## Takeaways
 I'm grateful to the organizers for putting together this challenge; it has been a fantastic learning experience. As a junior researcher, experimenting with different MARL algorithms has deepened my understanding of the field.
